@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALALIN - From QRIS Transaction to Syariah Financing</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        halalin: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            dark: '#0f172a',
+                            accent: '#f59e0b',
+                            gold: '#d97706'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #059669;
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Digital ID Metallic Glow */
+        .id-card-glow {
+            background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #022c22 100%);
+            box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .id-card-glow::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 55%);
+            animation: cardShine 6s infinite linear;
+        }
+        @keyframes cardShine {
+            0% { transform: translateY(-100%) rotate(0deg); }
+            100% { transform: translateY(100%) rotate(45deg); }
+        }
+
+        /* Scanner Line Animation */
+        @keyframes scanLine {
+            0% { top: 5%; opacity: 0.8; }
+            50% { top: 90%; opacity: 1; }
+            100% { top: 5%; opacity: 0.8; }
+        }
+        .animate-scan {
+            position: absolute;
+            width: 90%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            box-shadow: 0 0 15px #10b981;
+            animation: scanLine 2.2s ease-in-out infinite;
+        }
+
+        /* Glowing Pulse */
+        .pulse-emerald {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulseEmerald 2s infinite;
+        }
+        @keyframes pulseEmerald {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Custom Device Frame */
+        .mobile-frame {
+            max-width: 430px;
+            min-height: 880px;
+            border-radius: 44px;
+            border: 10px solid #334155;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+
+    <!-- Top Global Header -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-halalin-600 to-emerald-400 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-emerald-900/50">
+                    H
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-extrabold text-xl tracking-tight text-white">HALALIN</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold">Sharia Layer Innovation</span>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden sm:block">From QRIS Transaction to Syariah Financing</p>
+                </div>
+            </div>
+
+            <!-- View Mode Switcher -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700/60 text-xs w-full sm:w-auto justify-center">
+                <button id="btnViewUMKM" onclick="switchPerspective('umkm')" class="px-3 py-1.5 rounded-lg font-medium transition-all flex items-center space-x-1.5 bg-emerald-600 text-white shadow">
+                    <i class="fa-solid fa-store"></i>
+                    <span>Sisi UMKM (Cantika Coffee)</span>
+                </button>
+                <button id="btnViewLKS" onclick="switchPerspective('lks')" class="px-3 py-1.5 rounded-lg font-medium transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-[#fa-building-columns]"></i>
+                    <i class="fa-solid fa-building-columns"></i>
+                    <span>Portal LKS / BMT</span>
+                </button>
+                <button id="btnViewFlow" onclick="switchPerspective('architecture')" class="px-3 py-1.5 rounded-lg font-medium transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <span>Arsitektur System</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Interactive Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 flex flex-col justify-center items-center">
+
+        <!-- ========================================== -->
+        <!-- VIEW PERSPECTIVE 1: UMKM MOBILE SIMULATOR -->
+        <!-- ========================================== -->
+        <div id="perspectiveUMKM" class="w-full flex flex-col items-center">
+            
+            <!-- Context Banner -->
+            <div class="w-full max-w-md mb-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex items-center justify-between text-xs text-slate-300 shadow-md">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>Modul Aktif: <strong id="currentModuleName" class="text-emerald-400">01 Smart Bookkeeping</strong></span>
+                </div>
+                <button onclick="resetDemoData()" class="text-slate-400 hover:text-white underline text-[11px]">
+                    <i class="fa-solid fa-rotate-right mr-1"></i>Reset Demo
+                </button>
+            </div>
+
+            <!-- Mobile Phone Shell -->
+            <div class="mobile-frame w-full bg-slate-900 flex flex-col overflow-hidden relative border-slate-700">
+                
+                <!-- Mobile Status Bar -->
+                <div class="bg-slate-950 px-6 pt-3 pb-1 flex justify-between items-center text-xs text-slate-400 select-none z-40">
+                    <span class="font-semibold text-white">09:41</span>
+                    <div class="w-20 h-4 bg-slate-800 rounded-full mx-auto"></div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-signal text-[10px]"></i>
+                        <i class="fa-solid fa-wifi text-[10px]"></i>
+                        <i class="fa-solid fa-battery-full text-[11px]"></i>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC SCREEN CONTENT AREA -->
+                <div id="mobileScreenViewport" class="flex-1 overflow-y-auto overflow-x-hidden relative pb-20">
+
+                    <!-- SCREEN: AUTH (LOGIN & SIGNUP WITH NIK / NPWP) -->
+                    <div id="screenAuth" class="screen-content p-6 flex flex-col min-h-full justify-between">
+                        <div>
+                            <!-- Header branding -->
+                            <div class="text-center my-6">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-halalin-600 to-emerald-400 flex items-center justify-center text-white font-extrabold text-3xl mx-auto shadow-xl shadow-emerald-900/40 mb-3">
+                                    H
+                                </div>
+                                <h1 class="text-2xl font-bold tracking-tight text-white">HALALIN</h1>
+                                <p class="text-xs text-slate-400 mt-1">Sistem Layer Finansial Syariah UMKM Terintegrasi</p>
+                            </div>
+
+                            <!-- Tabs Login / Register -->
+                            <div class="flex bg-slate-800 p-1 rounded-xl mb-6 text-xs font-medium">
+                                <button id="tabAuthLogin" onclick="setAuthTab('login')" class="flex-1 py-2 rounded-lg bg-emerald-600 text-white font-semibold">Masuk</button>
+                                <button id="tabAuthRegister" onclick="setAuthTab('register')" class="flex-1 py-2 rounded-lg text-slate-400">Daftar Usaha</button>
+                            </div>
+
+                            <!-- Login Form -->
+                            <form id="formAuth" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-xs font-semibold text-slate-300">Metode Identifikasi Utama</label>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <button type="button" id="btnAuthTypeNIK" onclick="setAuthInputType('nik')" class="py-2 px-3 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-medium flex items-center justify-center space-x-1.5">
+                                            <i class="fa-solid fa-id-card"></i>
+                                            <span>Gunakan NIK</span>
+                                        </button>
+                                        <button type="button" id="btnAuthTypeNPWP" onclick="setAuthInputType('npwp')" class="py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-400 font-medium flex items-center justify-center space-x-1.5">
+                                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                                            <span>Gunakan NPWP</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label id="lblAuthInput" class="text-xs font-semibold text-slate-300 block mb-1">Nomor Induk Kependudukan (NIK)</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+                                            <i class="fa-solid fa-address-card text-sm"></i>
+                                        </span>
+                                        <input type="text" id="inputAuthId" required placeholder="3171012304950001" value="3171012304950001" class="w-full bg-slate-800 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 mt-1">Hanya simulasi input NIK 16 digit / NPWP 15-16 digit</p>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-300 block mb-1">Kata Sandi</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+                                            <i class="fa-solid fa-lock text-sm"></i>
+                                        </span>
+                                        <input type="password" required value="12345678" class="w-full bg-slate-800 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-emerald-500">
+                                    </div>
+                                </div>
+
+                                <!-- Quick Preset Autofill Button -->
+                                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 text-xs">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="text-[11px] font-semibold text-emerald-400">Simulasi Pemilik Usaha:</span>
+                                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded">Preset Sample</span>
+                                    </div>
+                                    <button type="button" onclick="autofillCantikaData()" class="w-full text-left text-xs bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 flex items-center justify-between text-slate-200">
+                                        <div>
+                                            <p class="font-bold text-white">Cantika Coffee</p>
+                                            <p class="text-[10px] text-slate-400">NIK: 3171012304950001 | NPWP: 09.384.120.4-012.000</p>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-xs text-emerald-400"></i>
+                                    </button>
+                                </div>
+
+                                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-halalin-600 hover:from-emerald-500 hover:to-halalin-500 text-white font-semibold py-3 rounded-xl text-xs transition-all shadow-lg shadow-emerald-900/40 flex items-center justify-center space-x-2">
+                                    <span>Masuk ke Dashboard HALALIN</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="text-center mt-6 text-[11px] text-slate-500 border-t border-slate-800/80 pt-4">
+                            <p>Keamanan Terenkripsi & Didukung Blockchain Audit Trail</p>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 01: HOME / SMART BOOKKEEPING -->
+                    <div id="screenHome" class="screen-content p-4 space-y-4 hidden">
+                        <!-- User Header -->
+                        <div class="flex items-center justify-between pt-2">
+                            <div>
+                                <h2 class="text-xs font-semibold text-emerald-400 tracking-wider uppercase">HALALIN</h2>
+                                <h1 class="text-lg font-bold text-white flex items-center gap-1.5">
+                                    Selamat datang, Cantika <span class="text-base">👋</span>
+                                </h1>
+                                <p class="text-[11px] text-slate-400">Kelola dan bangun rekam finansial usaha Anda.</p>
+                            </div>
+                            <button onclick="navigateTo('screenAuth')" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </div>
+
+                        <!-- Card Utama: Today's Revenue -->
+                        <div class="glass-card rounded-2xl p-4 border border-emerald-500/20 bg-gradient-to-br from-slate-800 to-slate-900 relative overflow-hidden">
+                            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-medium text-slate-300">Smart Bookkeeping</span>
+                                <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">Otomatis Sync</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mb-1">Semua transaksi usaha Anda tercatat secara otomatis.</p>
+                            
+                            <div class="mt-3">
+                                <span class="text-[11px] text-slate-400 block">Today's Revenue</span>
+                                <div class="flex items-baseline space-x-2 mt-0.5">
+                                    <span id="homeTodayRevenueDisplay" class="text-2xl font-extrabold text-white tracking-tight">Rp 1.250.000</span>
+                                    <span class="text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800">
+                                        +12.4% <i class="fa-solid fa-arrow-trend-up text-[9px]"></i>
+                                    </span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1">from yesterday</p>
+                            </div>
+                        </div>
+
+                        <!-- Quick Action Grid -->
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-300 mb-2 uppercase tracking-wider">Quick Action</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="navigateTo('screenScan')" class="p-3 bg-slate-800 hover:bg-slate-700/80 border border-emerald-500/30 rounded-xl text-center transition-all group flex flex-col items-center justify-center">
+                                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-1.5 text-base group-hover:scale-110 transition-transform">
+                                        📷
+                                    </div>
+                                    <span class="text-[11px] font-bold text-white block">Scan QRIS</span>
+                                    <span class="text-[9px] text-slate-400">Catat transaksi</span>
+                                </button>
+
+                                <button onclick="openOcrModal()" class="p-3 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 rounded-xl text-center transition-all group flex flex-col items-center justify-center">
+                                    <div class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-1.5 text-base group-hover:scale-110 transition-transform">
+                                        📷
+                                    </div>
+                                    <span class="text-[11px] font-bold text-white block">Scan Receipt</span>
+                                    <span class="text-[9px] text-slate-400">AI-OCR</span>
+                                </button>
+
+                                <button onclick="openManualTxModal()" class="p-3 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 rounded-xl text-center transition-all group flex flex-col items-center justify-center">
+                                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-1.5 text-base group-hover:scale-110 transition-transform">
+                                        ＋
+                                    </div>
+                                    <span class="text-[11px] font-bold text-white block">Add Manual</span>
+                                    <span class="text-[9px] text-slate-400">Input transaksi</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Transaction Activity -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Transaction Activity</h3>
+                                <span class="text-[10px] text-emerald-400 font-semibold">Today</span>
+                            </div>
+                            <div id="homeTxList" class="space-y-2">
+                                <!-- Initial items -->
+                                <div class="bg-slate-800/80 border border-slate-700/60 p-2.5 rounded-xl flex items-center justify-between">
+                                    <div class="flex items-center space-x-2.5">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                                        <div>
+                                            <p class="text-xs font-bold text-white">QRIS Transaction</p>
+                                            <p class="text-[10px] text-slate-400">14:20 WIB • Sales Revenue</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-emerald-400">+ Rp450.000</span>
+                                </div>
+
+                                <div class="bg-slate-800/80 border border-slate-700/60 p-2.5 rounded-xl flex items-center justify-between">
+                                    <div class="flex items-center space-x-2.5">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                                        <div>
+                                            <p class="text-xs font-bold text-white">QRIS Transaction</p>
+                                            <p class="text-[10px] text-slate-400">11:05 WIB • Sales Revenue</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-emerald-400">+ Rp300.000</span>
+                                </div>
+
+                                <div class="bg-slate-800/80 border border-slate-700/60 p-2.5 rounded-xl flex items-center justify-between">
+                                    <div class="flex items-center space-x-2.5">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                                        <div>
+                                            <p class="text-xs font-bold text-white">Business Expense</p>
+                                            <p class="text-[10px] text-slate-400">09:15 WIB • Raw Materials</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-rose-400">- Rp125.000</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Summary Card -->
+                        <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4">
+                            <h3 class="text-xs font-bold text-slate-300 mb-3 flex items-center justify-between">
+                                <span>FINANCIAL SUMMARY</span>
+                                <span class="text-[10px] text-slate-400 font-normal">Bulan Ini</span>
+                            </h3>
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                    <span class="text-[9px] text-slate-400 block uppercase">Revenue</span>
+                                    <span class="text-xs font-bold text-emerald-400">Rp38.450.000</span>
+                                </div>
+                                <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                    <span class="text-[9px] text-slate-400 block uppercase">Expense</span>
+                                    <span class="text-xs font-bold text-rose-400">Rp14.200.000</span>
+                                </div>
+                                <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                    <span class="text-[9px] text-slate-400 block uppercase">Net Cash</span>
+                                    <span class="text-xs font-bold text-white">Rp24.250.000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 02: SCAN QRIS -->
+                    <div id="screenScan" class="screen-content p-4 space-y-4 hidden">
+                        <div class="flex items-center justify-between">
+                            <button onclick="navigateTo('screenHome')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-left"></i> Kembali
+                            </button>
+                            <span class="text-xs font-bold text-emerald-400">QRIS Input Mode</span>
+                        </div>
+
+                        <div class="text-center">
+                            <h2 class="text-base font-bold text-white">Scan QRIS</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Scan transaksi untuk mencatat aktivitas usaha Anda.</p>
+                        </div>
+
+                        <!-- Scanner Viewfinder Container -->
+                        <div class="relative bg-slate-950 border-2 border-dashed border-emerald-500/40 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[260px] overflow-hidden">
+                            <div class="animate-scan"></div>
+                            
+                            <!-- QR Visual Box -->
+                            <div class="w-40 h-40 border-2 border-emerald-500 rounded-xl flex flex-col items-center justify-center bg-emerald-950/20 relative">
+                                <i class="fa-solid fa-qrcode text-6xl text-emerald-400 opacity-80"></i>
+                                <span class="text-[10px] font-bold tracking-widest text-emerald-300 mt-2 uppercase">QR SCANNER</span>
+                                <!-- Corner Brackets -->
+                                <div class="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-emerald-400"></div>
+                                <div class="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-emerald-400"></div>
+                                <div class="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-emerald-400"></div>
+                                <div class="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-emerald-400"></div>
+                            </div>
+
+                            <button onclick="simulateQrisScan()" class="mt-4 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl text-xs text-slate-200 font-medium flex items-center space-x-2 shadow">
+                                <i class="fa-solid fa-image text-emerald-400"></i>
+                                <span>Upload QR from Gallery / Camera</span>
+                            </button>
+                        </div>
+
+                        <!-- Detected Transaction Confirmation Card (Initially hidden or shown after scan action) -->
+                        <div id="qrisResultBox" class="bg-slate-800/90 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-check"></i> Transaction Detected
+                                </span>
+                                <span class="text-[10px] text-slate-400">QRIS Verified</span>
+                            </div>
+
+                            <div class="space-y-1.5 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Merchant</span>
+                                    <span class="font-bold text-white">Cantika Coffee</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-400">Amount</span>
+                                    <span class="text-base font-extrabold text-emerald-400">Rp185.000</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Payment Method</span>
+                                    <span class="font-medium text-slate-200">QRIS National</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Date</span>
+                                    <span class="text-slate-300">16 September 2026</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-700/80">
+                                <p class="text-[11px] text-slate-300 mb-2 text-center">Simpan transaksi ini ke pencatatan keuangan Anda?</p>
+                                <button onclick="confirmScanTransaction()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-900/50 flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-check"></i>
+                                    <span>Confirm Transaction</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-center p-3 bg-emerald-950/30 border border-emerald-800/40 rounded-xl">
+                            <p class="text-[11px] text-emerald-300 italic font-medium">
+                                "Every verified transaction strengthens your financial record."
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 03: SMART BOOKKEEPING RESULT -->
+                    <div id="screenBookkeepingResult" class="screen-content p-4 space-y-4 hidden">
+                        <div class="text-center pt-2">
+                            <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500 flex items-center justify-center mx-auto text-xl mb-2">
+                                ✓
+                            </div>
+                            <h2 class="text-lg font-bold text-white">Transaction Recorded</h2>
+                            <p class="text-xs text-slate-400">Transaksi berhasil masuk ke sistem Smart Bookkeeping</p>
+                        </div>
+
+                        <!-- Auto Categorization Card -->
+                        <div class="glass-card rounded-2xl p-4 border border-emerald-500/30 space-y-3">
+                            <div class="flex justify-between items-center text-xs border-b border-slate-700 pb-2">
+                                <span class="text-slate-400">Revenue</span>
+                                <span class="text-base font-extrabold text-emerald-400">Rp185.000</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block">Category</span>
+                                    <span class="font-bold text-white">Sales Revenue</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block">Source</span>
+                                    <span class="font-medium text-slate-200">QRIS</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-xs pt-1">
+                                <span class="text-[10px] text-slate-400">Status</span>
+                                <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800">
+                                    🟢 Verified
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- AI Auto Categorization Banner -->
+                        <div class="bg-slate-800/90 border border-slate-700 p-3 rounded-xl flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-robot text-sm"></i>
+                            </div>
+                            <div class="text-xs">
+                                <p class="font-bold text-slate-200 uppercase text-[10px]">AUTO CATEGORIZATION</p>
+                                <p class="text-slate-400">Transaction automatically categorized.</p>
+                                <p class="text-emerald-400 font-semibold mt-0.5">Income → Sales Revenue</p>
+                            </div>
+                        </div>
+
+                        <!-- Updated Financial Report Overview -->
+                        <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-2xl space-y-3">
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">FINANCIAL REPORT SUMMARY</h3>
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between py-1 border-b border-slate-700/60">
+                                    <span class="text-slate-400">Total Revenue</span>
+                                    <span class="font-bold text-emerald-400">Rp38.635.000</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-700/60">
+                                    <span class="text-slate-400">Total Expense</span>
+                                    <span class="font-bold text-rose-400">Rp14.200.000</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-700/60">
+                                    <span class="text-slate-400">Net Profit</span>
+                                    <span class="font-bold text-emerald-300">Rp24.435.000</span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span class="text-slate-400">Cash Flow</span>
+                                    <span class="font-bold text-white">Rp24.435.000</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CTA to Financial ID -->
+                        <button onclick="navigateTo('screenFinancialId')" class="w-full bg-gradient-to-r from-emerald-600 to-halalin-600 hover:from-emerald-500 hover:to-halalin-500 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-lg shadow-emerald-900/40 flex items-center justify-center space-x-2">
+                            <span>View Financial Dashboard & Identity</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- SCREEN 04: AMANAH FINANCIAL ID -->
+                    <div id="screenFinancialId" class="screen-content p-4 space-y-4 hidden">
+                        <div class="text-center pt-2">
+                            <h2 class="text-lg font-bold text-white">Amanah Financial ID</h2>
+                            <div class="flex items-center justify-center space-x-2 mt-1">
+                                <span class="text-xs font-mono font-bold text-emerald-400">AFI-2026-884920</span>
+                                <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full font-bold">🟢 Verified</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Your verified business financial identity.</p>
+                        </div>
+
+                        <!-- DIGITAL ID CARD -->
+                        <div class="id-card-glow rounded-2xl p-5 text-white shadow-xl relative border border-emerald-400/30">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <span class="text-[10px] font-extrabold tracking-widest text-emerald-300 block uppercase">HALALIN PLATFORM</span>
+                                    <span class="text-xs font-bold tracking-wider text-slate-200">AMANAH FINANCIAL ID</span>
+                                </div>
+                                <i class="fa-solid fa-shield-halal text-2xl text-amber-400"></i>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="text-xl font-extrabold tracking-tight text-white">CANTIKA COFFEE</h3>
+                                <p class="text-xs text-emerald-200">Food & Beverage • F&B Sector</p>
+                            </div>
+
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <span class="text-[9px] text-emerald-200/80 block uppercase">Financial ID Code</span>
+                                    <span class="font-mono text-sm font-bold tracking-widest text-amber-300">AFI-2026-884920</span>
+                                </div>
+                                <span class="text-[10px] bg-emerald-900/80 border border-emerald-400 text-emerald-300 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">
+                                    ✓ VERIFIED
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- VERIFIED FINANCIAL DATA -->
+                        <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4 space-y-3">
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">VERIFIED FINANCIAL DATA</h3>
+                            
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                                    <span class="text-[10px] text-slate-400 block">Transaction History</span>
+                                    <span id="financialIdTxCount" class="text-sm font-extrabold text-emerald-400">248 transactions</span>
+                                </div>
+                                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                                    <span class="text-[10px] text-slate-400 block">Revenue & Cash Flow</span>
+                                    <span class="text-sm font-extrabold text-white">Updated Today</span>
+                                </div>
+                                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                                    <span class="text-[10px] text-slate-400 block">Business Health</span>
+                                    <span class="text-sm font-extrabold text-emerald-400">Healthy (Grade A)</span>
+                                </div>
+                                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                                    <span class="text-[10px] text-slate-400 block">Financing History</span>
+                                    <span class="text-sm font-extrabold text-amber-400">Available / Clear</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ACTIVITY SOURCE VISUALIZATION -->
+                        <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4">
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">ACTIVITY SOURCE</h3>
+                            
+                            <!-- Step visual flow -->
+                            <div class="flex items-center justify-between text-center relative">
+                                <div class="z-10 bg-slate-900 p-2 rounded-xl border border-slate-700 w-24">
+                                    <i class="fa-solid fa-qrcode text-emerald-400 text-base mb-1 block"></i>
+                                    <span class="text-[10px] text-slate-300 block font-bold">QRIS Activity</span>
+                                    <span class="text-[9px] text-emerald-400 font-semibold">248 txs</span>
+                                </div>
+
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+
+                                <div class="z-10 bg-slate-900 p-2 rounded-xl border border-slate-700 w-24">
+                                    <i class="fa-solid fa-book text-blue-400 text-base mb-1 block"></i>
+                                    <span class="text-[10px] text-slate-300 block font-bold">Bookkeeping</span>
+                                    <span class="text-[9px] text-blue-400 font-semibold">248 verified</span>
+                                </div>
+
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+
+                                <div class="z-10 bg-slate-900 p-2 rounded-xl border border-emerald-500/50 w-24">
+                                    <i class="fa-solid fa-id-card text-amber-400 text-base mb-1 block"></i>
+                                    <span class="text-[10px] text-slate-300 block font-bold">Financial ID</span>
+                                    <span class="text-[9px] text-amber-400 font-semibold">Updated</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center p-3 bg-slate-900/60 border border-slate-800 rounded-xl">
+                            <p class="text-[11px] text-slate-400">
+                                Your Financial Identity is built from verified business activity.
+                            </p>
+                        </div>
+
+                        <!-- Action Button -->
+                        <button onclick="navigateTo('screenRiskProfile')" class="w-full bg-gradient-to-r from-emerald-600 to-halalin-600 hover:from-emerald-500 hover:to-halalin-500 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-lg shadow-emerald-900/40 flex items-center justify-center space-x-2">
+                            <span>Analyze Business Risk Profile</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- SCREEN 05: BUSINESS RISK PROFILE -->
+                    <div id="screenRiskProfile" class="screen-content p-4 space-y-4 hidden">
+                        <div class="text-center pt-2">
+                            <h2 class="text-lg font-bold text-white">Business Risk Profile</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Analisis kondisi usaha berdasarkan financial activity Anda.</p>
+                        </div>
+
+                        <!-- Profile Status Banner -->
+                        <div class="glass-card rounded-2xl p-4 border border-emerald-500/30 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block uppercase">Overall Profile Assessment</span>
+                                <span class="text-xl font-extrabold text-emerald-400">Stable Business</span>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Memenuhi kualifikasi skema pembiayaan Syariah</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500 flex items-center justify-center text-xl font-bold">
+                                📊
+                            </div>
+                        </div>
+
+                        <!-- 5 Key Indicators -->
+                        <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4 space-y-3">
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">5 INDIKATOR KINERJA USAHA</h3>
+
+                            <!-- Indicator 1 -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300 font-medium">Revenue Stability</span>
+                                    <span class="text-emerald-400 font-bold">80% (Tinggi)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full w-[80%] rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <!-- Indicator 2 -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300 font-medium">Cash Flow</span>
+                                    <span class="text-emerald-400 font-bold">90% (Sangat Sehat)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full w-[90%] rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <!-- Indicator 3 -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300 font-medium">Margin</span>
+                                    <span class="text-emerald-400 font-bold">70% (Optimal)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full w-[70%] rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <!-- Indicator 4 -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300 font-medium">Growth</span>
+                                    <span class="text-emerald-400 font-bold">80% (Positif)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full w-[80%] rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <!-- Indicator 5 -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300 font-medium">Business Volatility</span>
+                                    <span class="text-emerald-400 font-bold">30% (Rendah / Stabil)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-amber-500 h-full w-[30%] rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Business Insight -->
+                        <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4 space-y-2 text-xs">
+                            <h3 class="font-bold text-slate-300 uppercase tracking-wider text-[11px] mb-1">BUSINESS INSIGHT</h3>
+                            
+                            <div class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-check text-emerald-400 mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-white">Revenue:</span>
+                                    <span class="text-slate-300"> Consistent revenue activity detected.</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-check text-emerald-400 mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-white">Cash Flow:</span>
+                                    <span class="text-slate-300"> Positive cash flow pattern.</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-check text-emerald-400 mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-white">Growth:</span>
+                                    <span class="text-slate-300"> Business activity shows growth.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Generated CTA -->
+                        <div class="pt-2">
+                            <button onclick="navigateTo('screenFinancingMatch')" class="w-full bg-gradient-to-r from-emerald-600 to-halalin-600 hover:from-emerald-500 hover:to-halalin-500 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-lg shadow-emerald-900/40 flex items-center justify-center space-x-2">
+                                <span>Explore Syariah Financing Match</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 06: SYARIAH FINANCING MATCH -->
+                    <div id="screenFinancingMatch" class="screen-content p-4 space-y-4 hidden">
+                        <div class="text-center pt-2">
+                            <h2 class="text-lg font-bold text-white">Syariah Financing Match</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Temukan LKS/BMT berdasarkan profil usaha Anda.</p>
+                        </div>
+
+                        <!-- Primary Recommended Match -->
+                        <div class="glass-card rounded-2xl p-4 border-2 border-emerald-500/50 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-emerald-500 text-slate-950 text-[9px] font-extrabold px-3 py-1 rounded-bl-xl uppercase">
+                                Recommended
+                            </div>
+
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500 text-emerald-400 flex items-center justify-center text-lg font-bold">
+                                    <i class="fa-solid fa-building-columns"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-sm">BMT Amanah</h3>
+                                    <span class="text-xs font-bold text-emerald-400">92% Profile Match</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                                <div class="bg-slate-900/80 p-2 rounded-xl">
+                                    <span class="text-[10px] text-slate-400 block">Recommended Scheme</span>
+                                    <span class="font-bold text-amber-400">Mudharabah</span>
+                                </div>
+                                <div class="bg-slate-900/80 p-2 rounded-xl">
+                                    <span class="text-[10px] text-slate-400 block">Financing Range</span>
+                                    <span class="font-bold text-emerald-400">Rp30M – Rp50M</span>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Simulation -->
+                            <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-700/80 space-y-2">
+                                <span class="text-[10px] font-bold text-slate-300 uppercase block">SIMULASI PEMBIAYAAN</span>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-400">Estimated Financing:</span>
+                                    <span id="simAmountDisplay" class="font-extrabold text-white">Rp 50.000.000</span>
+                                </div>
+                                <input type="range" min="30000000" max="50000000" step="5000000" value="50000000" oninput="updateFinancingSimulation(this.value)" class="w-full accent-emerald-500 bg-slate-800">
+                                <div class="flex justify-between text-xs pt-1 border-t border-slate-800">
+                                    <span class="text-slate-400">Nisbah Bagi Hasil:</span>
+                                    <span class="font-bold text-emerald-400">60 : 40 (UMKM : BMT)</span>
+                                </div>
+                            </div>
+
+                            <button onclick="selectLksForApplication('BMT Amanah', 'Mudharabah', 50000000)" class="w-full mt-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 shadow">
+                                <span>View & Apply Financing</span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Other Matches -->
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">OTHER MATCHES</h3>
+                            <div class="space-y-2">
+                                <div class="bg-slate-800/80 border border-slate-700 p-3 rounded-xl flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-bold text-xs text-white">LKS Bina Usaha</h4>
+                                        <p class="text-[10px] text-slate-400">Musyarakah • Range Rp20M - Rp40M</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-xs font-bold text-emerald-400 block">87% Match</span>
+                                        <button onclick="selectLksForApplication('LKS Bina Usaha', 'Musyarakah', 40000000)" class="text-[10px] text-emerald-400 hover:underline">Pilih →</button>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-800/80 border border-slate-700 p-3 rounded-xl flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-bold text-xs text-white">BMT Sejahtera</h4>
+                                        <p class="text-[10px] text-slate-400">Mudharabah • Range Rp15M - Rp30M</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-xs font-bold text-emerald-400 block">81% Match</span>
+                                        <button onclick="selectLksForApplication('BMT Sejahtera', 'Mudharabah', 30000000)" class="text-[10px] text-emerald-400 hover:underline">Pilih →</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-amber-950/20 border border-amber-800/40 rounded-xl text-[10px] text-amber-300">
+                            <strong>IMPORTANT:</strong> HALALIN provides matching and financing recommendations. Final financing decisions remain with the LKS/BMT.
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 07: FINANCING APPLICATION (UMKM ENDPOINT) -->
+                    <div id="screenApplication" class="screen-content p-4 space-y-4 hidden">
+                        <div class="text-center pt-2">
+                            <h2 class="text-lg font-bold text-white">Financing Application</h2>
+                            <span id="appLksName" class="text-xs font-bold text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800 inline-block mt-1">BMT Amanah</span>
+                        </div>
+
+                        <!-- Application Summary -->
+                        <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4 space-y-2.5 text-xs">
+                            <h3 class="font-bold text-slate-300 uppercase text-[11px] border-b border-slate-700 pb-2">APPLICATION SUMMARY</h3>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Business</span>
+                                <span class="font-bold text-white">Cantika Coffee</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Financial ID</span>
+                                <span class="font-mono text-emerald-400 font-bold">AFI-2026-884920 ✓</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Risk Profile</span>
+                                <span class="font-bold text-emerald-400">Stable ✓</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Financing Scheme</span>
+                                <span id="appSchemeDisplay" class="font-bold text-amber-400">Mudharabah</span>
+                            </div>
+                            <div class="flex justify-between pt-1 border-t border-slate-700/60">
+                                <span class="text-slate-400">Amount Requested</span>
+                                <span id="appAmountDisplay" class="text-sm font-extrabold text-white">Rp50.000.000</span>
+                            </div>
+                        </div>
+
+                        <!-- Application Workflow Status Tracker -->
+                        <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4">
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">APPLICATION STATUS</h3>
+
+                            <div class="space-y-3 relative before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-700">
+                                <div class="flex items-center space-x-3 relative z-10">
+                                    <div class="w-7 h-7 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">✓</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-white">Financial ID</p>
+                                        <p class="text-[10px] text-emerald-400">Verified Activity Record</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center space-x-3 relative z-10">
+                                    <div class="w-7 h-7 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">✓</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-white">Risk Profile</p>
+                                        <p class="text-[10px] text-emerald-400">Stable Risk Calculated</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center space-x-3 relative z-10">
+                                    <div class="w-7 h-7 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">✓</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-white">Financing Match</p>
+                                        <p class="text-[10px] text-emerald-400">Matched with BMT Amanah</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center space-x-3 relative z-10">
+                                    <div id="statusDotApp" class="w-7 h-7 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-xs animate-pulse">●</div>
+                                    <div>
+                                        <p id="statusTitleApp" class="text-xs font-bold text-amber-400">Application Submitted</p>
+                                        <p id="statusDescApp" class="text-[10px] text-slate-400">Menunggu Review LKS / BMT</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center space-x-3 relative z-10 opacity-50">
+                                    <div class="w-7 h-7 rounded-full bg-slate-700 text-slate-400 flex items-center justify-center font-bold text-xs">○</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-400">Akad Syariah & Smart Contract</p>
+                                        <p class="text-[10px] text-slate-500">Akan diproses di Portal LKS</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Note about architecture split -->
+                        <div class="p-3 bg-blue-950/30 border border-blue-800/40 rounded-xl text-[10px] text-blue-300">
+                            <i class="fa-solid fa-circle-info mr-1"></i>
+                            <strong>Sistem HALALIN Info:</strong> Setelah aplikasi diajukan, proses Smart Contract, Eksekusi Akad, Monitoring Bagi Hasil, dan Audit Trail Blockchain dikelola dari sisi <strong>Portal LKS / BMT</strong>.
+                        </div>
+
+                        <button id="btnSubmitApp" onclick="submitFinancingApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs shadow-lg shadow-emerald-900/40">
+                            Submit Application
+                        </button>
+                    </div>
+
+                    <!-- SCREEN 12: FINANCIAL EDUCATION -->
+                    <div id="screenEducation" class="screen-content p-4 space-y-4 hidden">
+                        <div class="text-center pt-2">
+                            <h2 class="text-lg font-bold text-white">Financial Education</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Learn to Grow Your Business with Syariah Principles</p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-2xl flex items-start space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg flex-shrink-0">
+                                    📚
+                                </div>
+                                <div class="text-xs">
+                                    <h3 class="font-bold text-white text-sm">Understanding Cash Flow</h3>
+                                    <p class="text-slate-400 mt-1">Pelajari cara membaca arus kas usaha agar pencatatan di Smart Bookkeeping selalu akurat dan valid.</p>
+                                    <span class="text-[10px] text-emerald-400 font-semibold mt-2 inline-block">Mulai Belajar (5 min) →</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-2xl flex items-start space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg flex-shrink-0">
+                                    🤝
+                                </div>
+                                <div class="text-xs">
+                                    <h3 class="font-bold text-white text-sm">Understanding Profit Sharing</h3>
+                                    <p class="text-slate-400 mt-1">Kenali mekanisme bagi hasil Akad Mudharabah dan Musyarakah secara rinci dan adil.</p>
+                                    <span class="text-[10px] text-amber-400 font-semibold mt-2 inline-block">Mulai Belajar (8 min) →</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-2xl flex items-start space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg flex-shrink-0">
+                                    💚
+                                </div>
+                                <div class="text-xs">
+                                    <h3 class="font-bold text-white text-sm">Business Financial Health</h3>
+                                    <p class="text-slate-400 mt-1">Pahami indikator kesehatan usaha untuk menjaga Risk Profile usaha Anda tetap Stable.</p>
+                                    <span class="text-[10px] text-blue-400 font-semibold mt-2 inline-block">Mulai Belajar (6 min) →</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- BOTTOM NAVIGATION (UMKM VIEW) -->
+                <nav id="umkmBottomNav" class="absolute bottom-0 left-0 right-0 bg-slate-950/95 border-t border-slate-800 p-2 z-40">
+                    <div class="flex justify-around items-center relative">
+                        
+                        <button onclick="navigateTo('screenHome')" id="navHome" class="flex flex-col items-center text-emerald-400">
+                            <i class="fa-solid fa-house text-sm"></i>
+                            <span class="text-[9px] font-semibold mt-0.5">Home</span>
+                        </button>
+
+                        <button onclick="navigateTo('screenBookkeepingResult')" id="navBookkeeping" class="flex flex-col items-center text-slate-400 hover:text-emerald-400">
+                            <i class="fa-solid fa-book text-sm"></i>
+                            <span class="text-[9px] font-semibold mt-0.5">Bookkeeping</span>
+                        </button>
+
+                        <!-- Central Floating Button SCAN QRIS -->
+                        <div class="flex flex-col items-center -mt-6">
+                            <button onclick="navigateTo('screenScan')" class="w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-600 to-halalin-500 text-white flex items-center justify-center shadow-lg shadow-emerald-900/60 pulse-emerald border-2 border-slate-950">
+                                <i class="fa-solid fa-qrcode text-lg"></i>
+                            </button>
+                            <span class="text-[9px] font-extrabold text-emerald-400 mt-0.5">SCAN QRIS</span>
+                        </div>
+
+                        <button onclick="navigateTo('screenFinancialId')" id="navId" class="flex flex-col items-center text-slate-400 hover:text-emerald-400">
+                            <i class="fa-solid fa-id-card text-sm"></i>
+                            <span class="text-[9px] font-semibold mt-0.5">ID</span>
+                        </button>
+
+                        <button onclick="navigateTo('screenFinancingMatch')" id="navFinance" class="flex flex-col items-center text-slate-400 hover:text-emerald-400">
+                            <i class="fa-solid fa-hand-holding-dollar text-sm"></i>
+                            <span class="text-[9px] font-semibold mt-0.5">Finance</span>
+                        </button>
+
+                    </div>
+                </nav>
+
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW PERSPECTIVE 2: LKS / BMT PORTAL DASHBOARD -->
+        <!-- ========================================== -->
+        <div id="perspectiveLKS" class="w-full hidden space-y-6 max-w-6xl">
+            
+            <div class="glass-card rounded-2xl p-6 border border-slate-800 space-y-6">
+                <!-- Portal Header -->
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">HALALIN LKS PORTAL</span>
+                            <span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold">Instansi Pengawas</span>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-white">LKS Financing Dashboard</h2>
+                        <p class="text-xs text-slate-400">Dashboard Evaluasi Risiko, Eksekusi Smart Contract & Audit Trail Pembiayaan Syariah</p>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-slate-400">LKS Aktif:</span>
+                        <span class="text-xs font-bold text-emerald-400 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">BMT Amanah (ID: BMT-0921)</span>
+                    </div>
+                </div>
+
+                <!-- SCREEN 10: OVERVIEW METRICS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                        <span class="text-xs text-slate-400 block mb-1">Verified UMKM</span>
+                        <span class="text-2xl font-extrabold text-white">1,248</span>
+                    </div>
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                        <span class="text-xs text-slate-400 block mb-1">Financial IDs</span>
+                        <span class="text-2xl font-extrabold text-emerald-400">892</span>
+                    </div>
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                        <span class="text-xs text-slate-400 block mb-1">Applications</span>
+                        <span class="text-2xl font-extrabold text-amber-400">126</span>
+                    </div>
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                        <span class="text-xs text-slate-400 block mb-1">Active Financing</span>
+                        <span class="text-2xl font-extrabold text-blue-400">84</span>
+                    </div>
+                </div>
+
+                <!-- LKS SCREEN TAB NAVIGATION -->
+                <div class="flex border-b border-slate-800 space-x-4 text-xs font-bold">
+                    <button id="tabLksAppList" onclick="switchLksTab('appList')" class="py-2 border-b-2 border-emerald-500 text-emerald-400">Pengajuan UMKM (126)</button>
+                    <button id="tabLksReview" onclick="switchLksTab('profileView')" class="py-2 border-b-2 border-transparent text-slate-400 hover:text-white">Review Profile UMKM</button>
+                    <button id="tabLksContract" onclick="switchLksTab('smartContract')" class="py-2 border-b-2 border-transparent text-slate-400 hover:text-white">Smart Contract & Monitoring</button>
+                    <button id="tabLksAudit" onclick="switchLksTab('auditTrail')" class="py-2 border-b-2 border-transparent text-slate-400 hover:text-white">Blockchain Audit Trail 🔐</button>
+                </div>
+
+                <!-- LKS SUB-SCREEN 1: APPLICATION LIST -->
+                <div id="subLksAppList" class="space-y-3">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase">Aplikasi Pembiayaan Masuk</h3>
+
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-bold text-white text-base">Cantika Coffee</h4>
+                                <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800 font-mono">AFI-2026-884920</span>
+                                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">🟢 Financial ID Verified</span>
+                            </div>
+                            <div class="flex items-center space-x-4 text-xs text-slate-400">
+                                <span>Risk Profile: <strong class="text-emerald-400">Stable</strong></span>
+                                <span>Profile Match: <strong class="text-emerald-400">92%</strong></span>
+                                <span>Permohonan: <strong class="text-white">Rp50.000.000 (Mudharabah)</strong></span>
+                            </div>
+                        </div>
+
+                        <button onclick="switchLksTab('profileView')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
+                            Review Profile UMKM →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SCREEN 11: LKS PROFILE VIEW -->
+                <div id="subLksProfileView" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Cantika Coffee — Amanah Financial ID Review</h3>
+                            <span class="text-xs text-emerald-400">🟢 Verified System Data</span>
+                        </div>
+                        <span class="font-mono text-xs text-slate-400">AFI-2026-884920</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Financial Overview -->
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <h4 class="text-xs font-bold text-slate-300 uppercase border-b border-slate-800 pb-1">FINANCIAL OVERVIEW</h4>
+                            <div class="space-y-1.5 text-xs">
+                                <div class="flex justify-between"><span class="text-slate-400">Verified Transactions:</span><span class="font-bold text-white">248 txs</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Monthly Revenue:</span><span class="font-bold text-emerald-400">Rp38.635.000</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Net Cash Flow:</span><span class="font-bold text-emerald-400">Positive (Rp24.435.000)</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Growth Rate:</span><span class="font-bold text-white">+12.4% MoM</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Business Risk Indicators -->
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <h4 class="text-xs font-bold text-slate-300 uppercase border-b border-slate-800 pb-1">BUSINESS RISK PROFILE</h4>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between"><span class="text-slate-400">Revenue Stability</span><span class="text-emerald-400 font-bold">80%</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Cash Flow Health</span><span class="text-emerald-400 font-bold">90%</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Margin Strength</span><span class="text-emerald-400 font-bold">70%</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Growth Score</span><span class="text-emerald-400 font-bold">80%</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Volatility</span><span class="text-amber-400 font-bold">30% (Low Risk)</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-emerald-500/30 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs text-slate-400">Pengajuan: <strong>Mudharabah Rp50.000.000</strong></span>
+                            <p class="text-xs text-emerald-400 font-bold">Hasil Rekomendasi AI Matching: 92% Suitable</p>
+                        </div>
+                        <button onclick="approveAndCreateSmartContract()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg">
+                            Approve & Generate Smart Contract
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SCREEN 08: SMART CONTRACT & MONITORING (LKS SIDE) -->
+                <div id="subLksSmartContract" class="space-y-4 hidden">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <h3 class="text-base font-bold text-white">Smart Contract & Real-Time Monitoring</h3>
+                        <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-bold">🟢 Contract Active</span>
+                    </div>
+
+                    <!-- Contract Header -->
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">FINANCING STATUS</span>
+                            <span class="text-sm font-extrabold text-amber-400">Mudharabah — Active</span>
+                            <p class="text-white mt-0.5">Plafon: <strong>Rp50.000.000</strong></p>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">PROFIT SHARING (NISBAH)</span>
+                            <span class="text-sm font-extrabold text-emerald-400">60 : 40 (UMKM : BMT)</span>
+                            <p class="text-slate-300 mt-0.5">Current Period: <strong>Rp2.850.000</strong> (Calculated)</p>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">BUSINESS PERFORMANCE</span>
+                            <span class="text-xs font-bold text-emerald-400 block">Revenue +12.4%</span>
+                            <span class="text-xs font-bold text-emerald-400 block">Cash Flow +8.2%</span>
+                        </div>
+                    </div>
+
+                    <!-- Monitoring Bars -->
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-300 uppercase">MONITORING INDIKATOR REAL-TIME</h4>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-300">Business Performance Score</span>
+                                <span class="text-emerald-400 font-bold">85% (Stable)</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-emerald-500 h-full w-[85%] rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-300">Financing Performance Score</span>
+                                <span class="text-emerald-400 font-bold">92% (Exceeds Target)</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-emerald-500 h-full w-[92%] rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SCREEN 09: BLOCKCHAIN AUDIT TRAIL (LKS SIDE) -->
+                <div id="subLksAuditTrail" class="space-y-4 hidden">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <h3 class="text-base font-bold text-white">Blockchain Audit Trail</h3>
+                        <span class="text-xs text-amber-400 font-mono">Block Hash: 0x8f2e...49a1</span>
+                    </div>
+
+                    <!-- Steps Timeline -->
+                    <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 space-y-4 text-xs">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">✓</div>
+                            <div class="flex-1 border-b border-slate-800 pb-2 flex justify-between">
+                                <div>
+                                    <span class="font-bold text-white">Akad Created & Executed</span>
+                                    <p class="text-[10px] text-slate-400">Akad Mudharabah No. AKD-2026-0091</p>
+                                </div>
+                                <span class="text-[10px] text-emerald-400 font-mono">Verified Hash</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">✓</div>
+                            <div class="flex-1 border-b border-slate-800 pb-2 flex justify-between">
+                                <div>
+                                    <span class="font-bold text-white">Transaction Recorded</span>
+                                    <p class="text-[10px] text-slate-400">QRIS Feed & Smart Bookkeeping Sync</p>
+                                </div>
+                                <span class="text-[10px] text-emerald-400 font-mono">Verified Hash</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">✓</div>
+                            <div class="flex-1 border-b border-slate-800 pb-2 flex justify-between">
+                                <div>
+                                    <span class="font-bold text-white">Business Performance Updated</span>
+                                    <p class="text-[10px] text-slate-400">Dynamic Risk Score Refresh</p>
+                                </div>
+                                <span class="text-[10px] text-emerald-400 font-mono">Verified Hash</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">✓</div>
+                            <div class="flex-1 border-b border-slate-800 pb-2 flex justify-between">
+                                <div>
+                                    <span class="font-bold text-white">Profit Sharing Calculated</span>
+                                    <p class="text-[10px] text-slate-400">Nisbah 60:40 Automatic Split</p>
+                                </div>
+                                <span class="text-[10px] text-emerald-400 font-mono">Verified Hash</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">✓</div>
+                            <div class="flex-1 flex justify-between">
+                                <div>
+                                    <span class="font-bold text-white">Record Verified Immutable</span>
+                                    <p class="text-[10px] text-slate-400">Ledger Audited by Regulator Nodes</p>
+                                </div>
+                                <span class="text-[10px] text-emerald-400 font-mono">Verified Hash</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-900 border border-emerald-500/30 rounded-xl text-center">
+                        <span class="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5">
+                            🔐 Blockchain Verified
+                        </span>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Secure and traceable financing records across all Islamic financial institutions.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW PERSPECTIVE 3: SYSTEM ARCHITECTURE FLOW DIAGRAM -->
+        <!-- ========================================== -->
+        <div id="perspectiveArchitecture" class="w-full hidden space-y-6 max-w-5xl">
+            <div class="glass-card rounded-2xl p-6 border border-slate-800 text-center space-y-6">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white">Arsitektur Alur Sistem HALALIN</h2>
+                    <p class="text-xs text-slate-400 mt-1">“From QRIS Transaction to Syariah Financing” — Klik modul untuk menguji langsung interface</p>
+                </div>
+
+                <div class="flex flex-col items-center space-y-3 max-w-xl mx-auto text-xs font-semibold">
+                    
+                    <!-- Flow Node 0: QRIS -->
+                    <div onclick="switchPerspective('umkm'); navigateTo('screenScan')" class="w-full bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 p-3 rounded-xl shadow cursor-pointer transition-transform hover:scale-102 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-qrcode text-emerald-400 text-base"></i>
+                            <span class="text-white">00 QRIS / Transaction Input</span>
+                        </div>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Input Data</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-down text-emerald-400"></i>
+
+                    <!-- Flow Node 1: Smart Bookkeeping -->
+                    <div onclick="switchPerspective('umkm'); navigateTo('screenHome')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 rounded-xl shadow cursor-pointer transition-transform hover:scale-102 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-book text-emerald-400 text-base"></i>
+                            <span class="text-white">01 Smart Bookkeeping (AI-OCR, Categorization, Cash Flow)</span>
+                        </div>
+                        <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Sisi UMKM</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-down text-emerald-400"></i>
+
+                    <!-- Flow Node 2: Amanah Financial ID -->
+                    <div onclick="switchPerspective('umkm'); navigateTo('screenFinancialId')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 rounded-xl shadow cursor-pointer transition-transform hover:scale-102 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-id-card text-amber-400 text-base"></i>
+                            <span class="text-white">02 Amanah Financial ID (Identitas Finansial Terverifikasi)</span>
+                        </div>
+                        <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Sisi UMKM</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-down text-emerald-400"></i>
+
+                    <!-- Flow Node 3: Business Risk Profile -->
+                    <div onclick="switchPerspective('umkm'); navigateTo('screenRiskProfile')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 rounded-xl shadow cursor-pointer transition-transform hover:scale-102 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-line text-blue-400 text-base"></i>
+                            <span class="text-white">03 Business Risk Profile (5 Indikator Stabilitas Usaha)</span>
+                        </div>
+                        <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Sisi UMKM</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-down text-emerald-400"></i>
+
+                    <!-- Flow Node 4: Syariah Financing Match -->
+                    <div onclick="switchPerspective('umkm'); navigateTo('screenFinancingMatch')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 rounded-xl shadow cursor-pointer transition-transform hover:scale-102 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-handshake text-purple-400 text-base"></i>
+                            <span class="text-white">04 Syariah Financing Match (Matching UMKM ↔ LKS/BMT)</span>
+                        </div>
+                        <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Sisi UMKM</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-down text-emerald-400"></i>
+
+                    <!-- Flow Node 5: Smart Contract & Monitoring (LKS) -->
+                    <div onclick="switchPerspective('lks'); switchLksTab('smartContract')" class="w-full bg-gradient-to-r from-emerald-950 to-slate-900 hover:from-emerald-900 border border-emerald-500/50 p-3.5 rounded-xl shadow cursor-pointer transition-transform hover:scale-102 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-file-contract text-emerald-400 text-base"></i>
+                            <span class="text-white font-bold">05 Smart Contract, Monitoring & Blockchain Audit Trail</span>
+                        </div>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">Sisi LKS / BMT</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: AI-OCR RECEIPT SCANNER -->
+    <div id="modalOcr" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-blue-400"></i> AI-OCR Scan Receipt
+                </h3>
+                <button onclick="closeOcrModal()" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            
+            <p class="text-xs text-slate-300">Unggah foto struk/nota pembelian bahan baku usaha untuk ekstraksi otomatis.</p>
+            
+            <div class="border-2 border-dashed border-slate-700 rounded-xl p-6 text-center hover:border-blue-500 transition-colors cursor-pointer bg-slate-950">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 mb-2"></i>
+                <span class="text-xs font-bold text-slate-300 block">Klik untuk Upload Foto Struk</span>
+                <span class="text-[10px] text-slate-500 block mt-0.5">JPG, PNG atau PDF (Max 5MB)</span>
+            </div>
+
+            <button onclick="processSimulatedOcr()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs">
+                Simulasi Ekstraksi AI-OCR
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: MANUAL TRANSACTION ENTRY -->
+    <div id="modalManualTx" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-plus text-amber-400"></i> Add Manual Transaction
+                </h3>
+                <button onclick="closeManualTxModal()" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <form onsubmit="handleManualTxSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 mb-1">Tipe Transaksi</label>
+                    <select id="manualTxType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white">
+                        <option value="income">Pemasukan (Income)</option>
+                        <option value="expense">Pengeluaran (Expense)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 mb-1">Jumlah (Rp)</label>
+                    <input type="number" id="manualTxAmount" required placeholder="100000" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 mb-1">Keterangan / Deskripsi</label>
+                    <input type="text" id="manualTxDesc" required placeholder="Contoh: Penjualan Kopi Spesial" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white">
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs mt-2">
+                    Simpan Transaksi
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // State storage
+        const state = {
+            activePerspective: 'umkm', // 'umkm', 'lks', 'architecture'
+            currentScreen: 'screenAuth',
+            user: {
+                name: 'Cantika',
+                business: 'Cantika Coffee',
+                idType: 'nik',
+                idNumber: '3171012304950001',
+                financialId: 'AFI-2026-884920'
+            },
+            todayRevenue: 1250000,
+            txCount: 248,
+            appSubmitted: false,
+            contractApproved: false,
+            selectedLks: 'BMT Amanah',
+            selectedScheme: 'Mudharabah',
+            requestedAmount: 50000000
+        };
+
+        // Screen Name Mapping for Top Banner
+        const screenNames = {
+            'screenAuth': 'Login & Registrasi NIK/NPWP',
+            'screenHome': '01 Smart Bookkeeping',
+            'screenScan': '01 Smart Bookkeeping — QRIS Scanner',
+            'screenBookkeepingResult': '01 Smart Bookkeeping — Result',
+            'screenFinancialId': '02 Amanah Financial ID',
+            'screenRiskProfile': '03 Business Risk Profile',
+            'screenFinancingMatch': '04 Syariah Financing Match',
+            'screenApplication': '04 Syariah Financing — Application Status',
+            'screenEducation': 'Edukasi Keuangan Syariah'
+        };
+
+        // Navigation Controller for UMKM Screen Viewport
+        function navigateTo(screenId) {
+            state.currentScreen = screenId;
+            const screens = document.querySelectorAll('.screen-content');
+            screens.forEach(s => s.classList.add('hidden'));
+
+            const target = document.getElementById(screenId);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+
+            // Update Header Title
+            const titleElement = document.getElementById('currentModuleName');
+            if (titleElement && screenNames[screenId]) {
+                titleElement.textContent = screenNames[screenId];
+            }
+
+            // Update Bottom Nav Styling
+            updateBottomNavIcons(screenId);
+        }
+
+        // Perspective Switcher
+        function switchPerspective(perspective) {
+            state.activePerspective = perspective;
+
+            const pUmkm = document.getElementById('perspectiveUMKM');
+            const pLks = document.getElementById('perspectiveLKS');
+            const pArch = document.getElementById('perspectiveArchitecture');
+
+            const btnUmkm = document.getElementById('btnViewUMKM');
+            const btnLks = document.getElementById('btnViewLKS');
+            const btnFlow = document.getElementById('btnViewFlow');
+
+            // Reset buttons
+            [btnUmkm, btnLks, btnFlow].forEach(btn => {
+                btn.className = "px-3 py-1.5 rounded-lg font-medium transition-all flex items-center space-x-1.5 text-slate-400 hover:text-white";
+            });
+
+            pUmkm.classList.add('hidden');
+            pLks.classList.add('hidden');
+            pArch.classList.add('hidden');
+
+            if (perspective === 'umkm') {
+                pUmkm.classList.remove('hidden');
+                btnUmkm.className = "px-3 py-1.5 rounded-lg font-medium transition-all flex items-center space-x-1.5 bg-emerald-600 text-white shadow";
+            } else if (perspective === 'lks') {
+                pLks.classList.remove('hidden');
+                btnLks.className = "px-3 py-1.5 rounded-lg font-medium transition-all flex items-center space-x-1.5 bg-amber-600 text-white shadow";
+            } else if (perspective === 'architecture') {
+                pArch.classList.remove('hidden');
+                btnFlow.className = "px-3 py-1.5 rounded-lg font-medium transition-all flex items-center space-x-1.5 bg-blue-600 text-white shadow";
+            }
+        }
+
+        // Bottom Nav Active Highlight
+        function updateBottomNavIcons(screenId) {
+            const navHome = document.getElementById('navHome');
+            const navBook = document.getElementById('navBookkeeping');
+            const navId = document.getElementById('navId');
+            const navFinance = document.getElementById('navFinance');
+
+            const navs = [navHome, navBook, navId, navFinance];
+            navs.forEach(n => {
+                if (n) n.className = "flex flex-col items-center text-slate-400 hover:text-emerald-400";
+            });
+
+            if (screenId === 'screenHome' && navHome) navHome.className = "flex flex-col items-center text-emerald-400";
+            if (screenId === 'screenBookkeepingResult' && navBook) navBook.className = "flex flex-col items-center text-emerald-400";
+            if (screenId === 'screenFinancialId' && navId) navId.className = "flex flex-col items-center text-emerald-400";
+            if ((screenId === 'screenFinancingMatch' || screenId === 'screenApplication') && navFinance) navFinance.className = "flex flex-col items-center text-emerald-400";
+        }
+
+        function setAuthInputType(type) {
+            state.user.idType = type;
+            const btnNik = document.getElementById('btnAuthTypeNIK');
+            const btnNpwp = document.getElementById('btnAuthTypeNPWP');
+            const lblInput = document.getElementById('lblAuthInput');
+            const inputField = document.getElementById('inputAuthId');
+
+            if (type === 'nik') {
+                btnNik.className = "py-2 px-3 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-medium flex items-center justify-center space-x-1.5";
+                btnNpwp.className = "py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-400 font-medium flex items-center justify-center space-x-1.5";
+                lblInput.textContent = "Nomor Induk Kependudukan (NIK)";
+                inputField.placeholder = "3171012304950001";
+                inputField.value = "3171012304950001";
+            } else {
+                btnNpwp.className = "py-2 px-3 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-medium flex items-center justify-center space-x-1.5";
+                btnNik.className = "py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-400 font-medium flex items-center justify-center space-x-1.5";
+                lblInput.textContent = "Nomor Pokok Wajib Pajak (NPWP)";
+                inputField.placeholder = "09.384.120.4-012.000";
+                inputField.value = "09.384.120.4-012.000";
+            }
+        }
+
+        function autofillCantikaData() {
+            setAuthInputType('nik');
+            document.getElementById('inputAuthId').value = "3171012304950001";
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            navigateTo('screenHome');
+        }
+
+        function simulateQrisScan() {
+            const box = document.getElementById('qrisResultBox');
+            box.classList.remove('hidden');
+            box.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function confirmScanTransaction() {
+            // Update revenue and count
+            state.todayRevenue += 185000;
+            state.txCount += 1;
+
+            document.getElementById('homeTodayRevenueDisplay').textContent = "Rp " + state.todayRevenue.toLocaleString('id-ID');
+            document.getElementById('financialIdTxCount').textContent = state.txCount + " transactions";
+
+            // Add item to Tx list in screenHome
+            const txList = document.getElementById('homeTxList');
+            const newItem = document.createElement('div');
+            newItem.className = "bg-slate-800/80 border border-emerald-500/40 p-2.5 rounded-xl flex items-center justify-between";
+            newItem.innerHTML = `
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                    <div>
+                        <p class="text-xs font-bold text-white">QRIS Transaction</p>
+                        <p class="text-[10px] text-slate-400">Baru Saja • Sales Revenue</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold text-emerald-400">+ Rp185.000</span>
+            `;
+            txList.insertBefore(newItem, txList.firstChild);
+
+            navigateTo('screenBookkeepingResult');
+        }
+
+        function openOcrModal() {
+            document.getElementById('modalOcr').classList.remove('hidden');
+        }
+        function closeOcrModal() {
+            document.getElementById('modalOcr').classList.add('hidden');
+        }
+        function processSimulatedOcr() {
+            closeOcrModal();
+            alert("AI-OCR Berhasil! Struk pembelian bahan baku kopi senilai Rp250.000 berhasil dikategorikan sebagai Business Expense.");
+        }
+
+        function openManualTxModal() {
+            document.getElementById('modalManualTx').classList.remove('hidden');
+        }
+        function closeManualTxModal() {
+            document.getElementById('modalManualTx').classList.add('hidden');
+        }
+        function handleManualTxSubmit(e) {
+            e.preventDefault();
+            closeManualTxModal();
+            const amt = parseInt(document.getElementById('manualTxAmount').value) || 0;
+            const desc = document.getElementById('manualTxDesc').value;
+            const type = document.getElementById('manualTxType').value;
+
+            if (type === 'income') {
+                state.todayRevenue += amt;
+                document.getElementById('homeTodayRevenueDisplay').textContent = "Rp " + state.todayRevenue.toLocaleString('id-ID');
+            }
+            alert(`Transaksi "${desc}" senilai Rp${amt.toLocaleString('id-ID')} berhasil dicatat dalam Smart Bookkeeping.`);
+            navigateTo('screenHome');
+        }
+
+        function updateFinancingSimulation(val) {
+            const formatted = "Rp " + parseInt(val).toLocaleString('id-ID');
+            document.getElementById('simAmountDisplay').textContent = formatted;
+            state.requestedAmount = parseInt(val);
+        }
+
+        function selectLksForApplication(lksName, scheme, amount) {
+            state.selectedLks = lksName;
+            state.selectedScheme = scheme;
+            state.requestedAmount = amount;
+
+            document.getElementById('appLksName').textContent = lksName;
+            document.getElementById('appSchemeDisplay').textContent = scheme;
+            document.getElementById('appAmountDisplay').textContent = "Rp " + amount.toLocaleString('id-ID');
+
+            navigateTo('screenApplication');
+        }
+
+        function submitFinancingApp() {
+            state.appSubmitted = true;
+            document.getElementById('statusDotApp').textContent = "✓";
+            document.getElementById('statusDotApp').className = "w-7 h-7 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs";
+            document.getElementById('statusTitleApp').textContent = "Application Received by LKS";
+            document.getElementById('statusTitleApp').className = "text-xs font-bold text-emerald-400";
+            document.getElementById('statusDescApp').textContent = "Silakan periksa Portal LKS untuk eksekusi Akad & Smart Contract";
+            document.getElementById('btnSubmitApp').disabled = true;
+            document.getElementById('btnSubmitApp').innerText = "Application Submitted";
+            document.getElementById('btnSubmitApp').className = "w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-xl text-xs cursor-not-allowed";
+
+            alert("Permohonan Pembiayaan berhasil diajukan! Anda dapat beralih ke 'Portal LKS / BMT' pada menu atas untuk memproses Smart Contract.");
+        }
+
+        function switchLksTab(tabId) {
+            const tabs = ['appList', 'profileView', 'smartContract', 'auditTrail'];
+            tabs.forEach(t => {
+                const sub = document.getElementById('subLks' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (sub) sub.classList.add('hidden');
+            });
+
+            // Reset tab headers
+            document.getElementById('tabLksAppList').className = "py-2 border-b-2 border-transparent text-slate-400 hover:text-white";
+            document.getElementById('tabLksReview').className = "py-2 border-b-2 border-transparent text-slate-400 hover:text-white";
+            document.getElementById('tabLksContract').className = "py-2 border-b-2 border-transparent text-slate-400 hover:text-white";
+            document.getElementById('tabLksAudit').className = "py-2 border-b-2 border-transparent text-slate-400 hover:text-white";
+
+            if (tabId === 'appList') {
+                document.getElementById('subLksAppList').classList.remove('hidden');
+                document.getElementById('tabLksAppList').className = "py-2 border-b-2 border-emerald-500 text-emerald-400 font-bold";
+            } else if (tabId === 'profileView') {
+                document.getElementById('subLksProfileView').classList.remove('hidden');
+                document.getElementById('tabLksReview').className = "py-2 border-b-2 border-emerald-500 text-emerald-400 font-bold";
+            } else if (tabId === 'smartContract') {
+                document.getElementById('subLksSmartContract').classList.remove('hidden');
+                document.getElementById('tabLksContract').className = "py-2 border-b-2 border-emerald-500 text-emerald-400 font-bold";
+            } else if (tabId === 'auditTrail') {
+                document.getElementById('subLksAuditTrail').classList.remove('hidden');
+                document.getElementById('tabLksAudit').className = "py-2 border-b-2 border-emerald-500 text-emerald-400 font-bold";
+            }
+        }
+
+        function approveAndCreateSmartContract() {
+            state.contractApproved = true;
+            alert("Akad & Smart Contract berhasil dieksekusi oleh BMT Amanah! Data akad dan bagi hasil tercatat secara otomatis pada Blockchain Audit Trail.");
+            switchLksTab('smartContract');
+        }
+
+        function resetDemoData() {
+            state.todayRevenue = 1250000;
+            state.txCount = 248;
+            state.appSubmitted = false;
+            document.getElementById('homeTodayRevenueDisplay').textContent = "Rp 1.250.000";
+            document.getElementById('financialIdTxCount').textContent = "248 transactions";
+            navigateTo('screenAuth');
+        }
+
+        // Initialize App on Window Load
+        window.onload = function() {
+            navigateTo('screenHome');
+        };
+    </script>
+</body>
+</html>
